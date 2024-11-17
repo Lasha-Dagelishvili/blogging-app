@@ -10,12 +10,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "autoprefixer": "^10.4.20",
+    "class-variance-authority": "^0.7.0",
     "i18next": "^23.16.5",
     "i18next-browser-languagedetector": "^8.0.0",
+    "lucide-react": "^0.460.0",
+    "postcss": "^8.4.49",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^15.1.1",
     "react-router-dom": "^6.28.0",
+    "tailwind-variants": "^0.3.0",
+    "tailwindcss": "^3.4.15",
+    "tailwindcss-animate": "^1.0.7",
     "ui": "shadcn/ui"
   },
   "devDependencies": {
@@ -28,6 +35,7 @@
     "eslint": "^9.13.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
+    "eslint-plugin-tailwindcss": "^3.17.5",
     "globals": "^15.11.0",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.11.0",
