@@ -4,14 +4,12 @@ import { supabase } from "../lib/connection";
 import { Link } from "react-router-dom";
 
 interface RegisterCredentials {
-  name: string;
   email: string;
   password: string;
 }
 
 interface RegisterResponse {
   id: number;
-  name: string;
   email: string;
 }
 
@@ -23,7 +21,6 @@ const registerUser = async (
       .from("registration")
       .insert([
         {
-          name: credentials.name,
           email: credentials.email,
           password: credentials.password,
         },
@@ -44,7 +41,6 @@ const registerUser = async (
 
 const SignUpPage: React.FC = () => {
   const [form, setForm] = useState<RegisterCredentials>({
-    name: "",
     email: "",
     password: "",
   });
@@ -55,8 +51,8 @@ const SignUpPage: React.FC = () => {
     Error,
     RegisterCredentials
   >(registerUser, {
-    onSuccess: (data) => {
-      alert(`User registered successfully! Welcome, ${data.name}`);
+    onSuccess: (_data) => {
+      alert(`User registered successfully! Welcome,`);
     },
     onError: (error) => {
       alert(`Error: ${error.message}`);
@@ -86,19 +82,6 @@ const SignUpPage: React.FC = () => {
           <h2 className="text-2xl font-bold mb-6 text-center">Sign Up for BitBlogs</h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label htmlFor="name" className="block mb-2 text-sm">
-                Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                placeholder="Name"
-                required
-              />
-            </div>
-            <div className="mb-4">
               <label htmlFor="email" className="block mb-2 text-sm">
                 Email
               </label>
@@ -109,6 +92,7 @@ const SignUpPage: React.FC = () => {
                 onChange={handleChange}
                 placeholder="Email"
                 required
+                className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
               />
             </div>
             <div className="mb-4">
@@ -122,6 +106,7 @@ const SignUpPage: React.FC = () => {
                 onChange={handleChange}
                 placeholder="Password"
                 required
+                className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
               />
             </div>
             <div className="mb-6">
@@ -134,9 +119,14 @@ const SignUpPage: React.FC = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm Password"
                 required
+                className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
               />
             </div>
-            <button type="submit" disabled={isLoading}>
+            <button 
+              type="submit"
+              disabled={isLoading} 
+              className="w-full p-2 bg-blue-500 rounded text-white hover:bg-blue-600"
+            >
               {isLoading ? "Registering..." : "Sign Up"}
             </button>
             {isError && <p>Error: {error?.message}</p>}

@@ -94,7 +94,7 @@ const AboutPage: FC = () => {
           future of technology together.
         </p>
       <Link to="/SignUp">
-        <Button>Get Started Today</Button>
+        <Button className="pl-6 pr-6 bg-blue-600 rounded text-white hover:bg-blue-700">Get Started Today</Button>
       </Link>
       </div>
     </div>
