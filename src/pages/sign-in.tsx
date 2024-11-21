@@ -1,143 +1,123 @@
 import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { useMutation } from "react-query";
+import { supabase } from "../lib/connection";
 
-export const SignInPage = () => {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-white">
-        <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full">
-          <h2 className="text-2xl font-bold mb-6 text-center">Log in to BitBlogs</h2>
-          <form>
-            <div className="mb-4">
-              <label htmlFor="email" className="block mb-2 text-sm">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                className="w-full px-4 py-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring focus:ring-blue-600"
-                placeholder="john@example.com"
-              />
-            </div>
-            <div className="mb-6">
-              <label htmlFor="password" className="block mb-2 text-sm">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                className="w-full px-4 py-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring focus:ring-blue-600"
-                placeholder="••••••••"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md"
-            >
-              Log In
-            </button>
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+interface LoginResponse {
+  id: number;
+  email: string;
+}
+
+const loginUser = async (
+  credentials: LoginCredentials
+): Promise<LoginResponse> => {
+  try {
+    const { data, error } = await supabase
+      .from("registration")
+      .select("*")
+      .eq("email", credentials.email)
+      .eq("password", credentials.password)
+      .single();
+
+    if (error) {
+      console.error("Supabase Error:", error);
+      throw new Error("Invalid email or password");
+    }
+
+    return data as LoginResponse;
+  } catch (err) {
+    console.error("Unexpected Error:", err);
+    throw new Error("Unexpected error occurred during login");
+  }
+};
+
+const SignInPage: React.FC = () => {
+  const [form, setForm] = useState<LoginCredentials>({
+    email: "",
+    password: "",
+  });
+
+  const { mutate: signIn, isLoading, isError, error } = useMutation<
+    LoginResponse,
+    Error,
+    LoginCredentials
+  >(loginUser, {
+    onSuccess: (_data) => {
+      alert(`Welcome back!`);
+    },
+    onError: (error) => {
+      alert(`Error: ${error.message}`);
+    },
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    signIn(form);
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-black text-white">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full">
+        <h2 className="text-2xl font-bold mb-6 text-center">Log in to BitBlogs</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="email" className="block mb-2 text-sm">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="Email"
+              required
+              className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
+            />
+          </div>
+          <div className="mb-6">
+            <label htmlFor="password" className="block mb-2 text-sm">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Password"
+              required
+              className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full p-2 bg-blue-500 rounded text-white hover:bg-blue-600"
+          >
+            {isLoading ? "Signing In..." : "Sign In"}
+          </button>
+          {isError && <p className="mt-4 text-red-500 text-sm">Error: {error?.message}</p>}
         </form>
-            <div className="flex justify-between mt-4 text-sm">
-                <Link to="#" className="hover:underline  text-gray-400">
-                    Forgot password?
-                </Link>
-                <Link to="/SignUp" className="hover:underline text-blue-500">
-                    Sign up
-                </Link>
-            </div>
+        <div className="flex justify-between mt-4 text-sm">
+          <Link to="#" className="hover:underline text-gray-400">
+            Forgot password?
+          </Link>
+          <Link to="/SignUp" className="hover:underline text-blue-500">
+            Sign up
+          </Link>
         </div>
       </div>
-    );
-  };
-  
+    </div>
+  );
+};
 
-
-//   import { Link } from "react-router-dom";
-// import { useMutation } from "@tanstack/react-query";
-// import { supabase } from "../supabase/client"; // import the supabase client
-
-// interface LoginCredentials {
-//   email: string;
-//   password: string;
-// }
-
-// interface LoginResponse {
-//   email: string;
-// }
-
-// const login = async (credentials: LoginCredentials): Promise<LoginResponse> => {
-//   const { email, password } = credentials;
-
-//   const { data, error } = await supabase.auth.signInWithPassword({
-//     email,
-//     password,
-//   });
-
-//   if (error) {
-//     throw new Error(error.message); // Error handling
-//   }
-
-//   return { email: data?.user?.email ?? "" }; // Return the email from supabase response
-// };
-
-// export const SignInPage = () => {
-//   const { mutate: signIn, isLoading, isError, error } = useMutation<LoginResponse, Error, LoginCredentials>(login);
-
-//   const handleSubmit = (e: React.FormEvent) => {
-//     e.preventDefault();
-//     const email = (e.target as HTMLFormElement).email.value;
-//     const password = (e.target as HTMLFormElement).password.value;
-
-//     signIn({ email, password }); // Pass correct type for credentials
-//   };
-
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-black text-white">
-//       <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full">
-//         <h2 className="text-2xl font-bold mb-6 text-center">Log in to BitBlogs</h2>
-//         <form onSubmit={handleSubmit}>
-//           <div className="mb-4">
-//             <label htmlFor="email" className="block mb-2 text-sm">
-//               Email
-//             </label>
-//             <input
-//               type="email"
-//               id="email"
-//               name="email"
-//               className="w-full px-4 py-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring focus:ring-blue-600"
-//               placeholder="john@example.com"
-//               required
-//             />
-//           </div>
-//           <div className="mb-6">
-//             <label htmlFor="password" className="block mb-2 text-sm">
-//               Password
-//             </label>
-//             <input
-//               type="password"
-//               id="password"
-//               name="password"
-//               className="w-full px-4 py-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring focus:ring-blue-600"
-//               placeholder="••••••••"
-//               required
-//             />
-//           </div>
-//           <button
-//             type="submit"
-//             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md"
-//             disabled={isLoading}
-//           >
-//             {isLoading ? 'Logging in...' : 'Log In'}
-//           </button>
-//         </form>
-//         {isError && <p className="text-red-500 mt-4">{error?.message}</p>}
-//         <div className="flex justify-between mt-4 text-sm">
-//           <Link to="#" className="hover:underline text-gray-400">
-//             Forgot password?
-//           </Link>
-//           <Link to="/SignUp" className="hover:underline text-blue-500">
-//             Sign up
-//           </Link>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+export default SignInPage;
