@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { useMutation } from "react-query";
 import { supabase } from "../lib/connection";
@@ -35,6 +35,7 @@ const loginUser = async (credentials: LoginCredentials): Promise<LoginResponse> 
 };
 
 const SignInPage: React.FC = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState<LoginCredentials>({
     email: "",
     password: "",
@@ -45,8 +46,8 @@ const SignInPage: React.FC = () => {
     Error,
     LoginCredentials
   >(loginUser, {
-    onSuccess: (user) => {
-      alert(`Welcome back, ${user.email ?? "User"}!`);
+    onSuccess: () => {
+      navigate("/")
     },
     onError: (error) => {
       alert(`Error: ${error.message}`);

@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { SunIcon, MoonIcon, GlobeIcon, SearchIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useAuthContext } from "@/context/auth/hooks/useAuthContext";
+import { useMutation } from "react-query";
+import { Logout } from "@/lib/connection";
 
 export const Header = () => {
+  const {user} = useAuthContext();
+
+  const {mutate:handleLogout} = useMutation({ mutationKey:['Logout'], mutationFn: Logout })
+
   const { i18n } = useTranslation();
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
@@ -32,12 +39,12 @@ export const Header = () => {
             <SearchIcon className="w-5 h-5" />
           </button>
 
-          <Link
+          {user ? <span onClick={() => handleLogout} className="cursor-pointer">Logout</span> :<NavLink
             to="/SignIn"
             className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
           >
             Sign In
-          </Link>
+          </NavLink>}
 
           <div className="relative">
             <button

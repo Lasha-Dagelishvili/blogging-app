@@ -1,17 +1,38 @@
 import { Routes, Route } from "react-router-dom";
 import { Layout } from "./copmonents/layout";
 import { Loading } from "./copmonents/loading";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import HomePage from "./pages/home";
 import  SignInPage from "./pages/sign-in";
 import  SignUpPage  from "./pages/sign-up";
 import WritePage from "./pages/write";
 import AboutPage from "./pages/about";
 import NotFoundPage from "./pages/not-found";
+import { supabase } from "./lib/connection";
+import { useAuthContext } from "./context/auth/hooks/useAuthContext";
 
 function App() {
-  return (
 
+
+  const {handleSetUser} = useAuthContext()
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      handleSetUser(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) =>{
+      handleSetUser(session);
+    });
+
+    return () => subscription.unsubscribe();
+
+  }, []);
+
+
+  return (
       <Routes>
         <Route element={<Layout />}>
           <Route
