@@ -1,10 +1,14 @@
+import { Link } from "react-router-dom";
 
 
 const WritePage = () => {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-white">
-        <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full">
-          <h2 className="text-2xl font-bold mb-6 text-center">Welcome to the Blog</h2>
+      <div className="min-h-screen items-center bg-black text-white">
+        <div className="flex">
+          You must be logged in to write a post.
+          <Link to={"/SignIn"}>
+            Login
+          </Link>
         </div>
       </div>
     );

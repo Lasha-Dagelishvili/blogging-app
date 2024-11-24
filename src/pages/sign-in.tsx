@@ -9,31 +9,29 @@ interface LoginCredentials {
 }
 
 interface LoginResponse {
-  id: number;
-  email: string;
+  id: string;
+  email?: string;
 }
 
-const loginUser = async (
-  credentials: LoginCredentials
-): Promise<LoginResponse> => {
-  try {
-    const { data, error } = await supabase
-      .from("registration")
-      .select("*")
-      .eq("email", credentials.email)
-      .eq("password", credentials.password)
-      .single();
+const loginUser = async (credentials: LoginCredentials): Promise<LoginResponse> => {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: credentials.email,
+    password: credentials.password,
+  });
 
-    if (error) {
-      console.error("Supabase Error:", error);
-      throw new Error("Invalid email or password");
-    }
-
-    return data as LoginResponse;
-  } catch (err) {
-    console.error("Unexpected Error:", err);
-    throw new Error("Unexpected error occurred during login");
+  if (error) {
+    console.error("Supabase Error:", error);
+    throw new Error(error.message || "Invalid email or password");
   }
+
+  if (!data.user) {
+    throw new Error("User not found");
+  }
+
+  return {
+    id: data.user.id,
+    email: data.user.email,
+  };
 };
 
 const SignInPage: React.FC = () => {
@@ -47,8 +45,8 @@ const SignInPage: React.FC = () => {
     Error,
     LoginCredentials
   >(loginUser, {
-    onSuccess: (_data) => {
-      alert(`Welcome back!`);
+    onSuccess: (user) => {
+      alert(`Welcome back, ${user.email ?? "User"}!`);
     },
     onError: (error) => {
       alert(`Error: ${error.message}`);
