@@ -70,9 +70,7 @@ function App() {
           path="Write"
           element={
             <Suspense fallback={<Loading />}>
-              <AuthGuard>
                 <WritePage />
-              </AuthGuard>
             </Suspense>
           }
         />
