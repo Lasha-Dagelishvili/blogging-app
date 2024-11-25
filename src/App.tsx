@@ -80,7 +80,9 @@ function App() {
           path="Profile"
           element={
             <Suspense fallback={<Loading />}>
+              <AuthGuard>
                 <ProfileView />
+              </AuthGuard>
             </Suspense>
           }
         />

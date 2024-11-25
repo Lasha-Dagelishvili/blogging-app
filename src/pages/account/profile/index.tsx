@@ -1,7 +1,7 @@
 import { userAtom } from "@/store/auth";
 import { fillProfileInfo, getProfileInfo } from "@/supabase/account/index";
 import { FillProfileInPayload } from "@/supabase/account/index.types";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation } from "react-query";
 import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
 
@@ -38,7 +38,7 @@ const ProfileView = () => {
                 <div className="mb-4">
                     <label>username</label>
                         <input
-                            className="border border-white"
+                            className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
                             name="username"
                             value={profilePayload.username}
                             onChange={(e) => {
@@ -54,7 +54,7 @@ const ProfileView = () => {
                 <div className="mb-4">
                     <label>Avatar Url</label>
                         <input
-                            className="border border-white"
+                            className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
                             name="avatar"
                             value={profilePayload.avatar_url}
                             onChange={(e) => {
@@ -70,9 +70,9 @@ const ProfileView = () => {
                 <div className="mb-6">
                     <label>Full Name Ka</label>
                         <input
-                            className="border border-white"
+                            className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
                             name="fullnameka"
-                            value={profilePayload.full_name_en}
+                            value={profilePayload.full_name_ka}
                             onChange={(e) => {
                             setProfilePayload({
                                 username: profilePayload.username,
@@ -86,7 +86,7 @@ const ProfileView = () => {
                 <div className="mb-6">
                     <label>Full Name En</label>
                         <input
-                            className="border border-white"
+                            className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
                             value={profilePayload.full_name_en}
                             name="fullnameen"
                             onChange={(e) => {
@@ -99,7 +99,11 @@ const ProfileView = () => {
                             }}
                         />
                 </div>
-                <button onClick={handleSubmit}>SUBMIT</button>
+                <button 
+                    onClick={handleSubmit}
+                    className="w-full p-2 bg-blue-500 rounded text-white hover:bg-blue-600"
+                >
+                    SUBMIT</button>
             </form>
         </div>
     </div>
