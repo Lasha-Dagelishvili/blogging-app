@@ -8,88 +8,100 @@ import  SignUpPage  from "./pages/sign-up";
 import WritePage from "./pages/write";
 import AboutPage from "./pages/about";
 import NotFoundPage from "./pages/not-found";
-import { supabase } from "./lib/connection";
+import { supabase } from "./supabase/index";
 import { useAuthContext } from "./context/auth/hooks/useAuthContext";
+import AuthGuard from "./copmonents/router-guards/auth";
+import GuestGuard from "./copmonents/router-guards/guest";
+import ProfileView from "./pages/account/profile/index";
 
 function App() {
 
-
-  const {handleSetUser} = useAuthContext()
+  const { setUser } = useAuthContext();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      handleSetUser(session);
+      setUser(session?.user || null);
     });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) =>{
-      handleSetUser(session);
+  
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
     });
-
-    return () => subscription.unsubscribe();
-
-  }, []);
+  
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [setUser]);
+  
+  
 
 
   return (
-      <Routes>
-        <Route element={<Layout />}>
-          <Route
-              index
-              element={
-                <Suspense fallback={<Loading />}>
-                  <HomePage />
-                </Suspense>
-              }
-            />
-
-          <Route
-            path='SignIn'
-            element={
-              <Suspense fallback={<Loading />}>
-                <SignInPage />
-              </Suspense>
-            }
-          />
-
-          <Route
-            path='SignUp'
-            element={
-              <Suspense fallback={<Loading />}>
-                <SignUpPage />
-              </Suspense>
-            }
-          />
-
-          <Route
-            path='Write'
-            element={
-              <Suspense fallback={<Loading />}>
-                <WritePage />
-              </Suspense>
-            }
-          />
-
-          <Route
-            path='about'
-            element={
-              <Suspense fallback={<Loading />}>
-                <AboutPage />
-              </Suspense>
-            }
-          />
-        </Route>
-
+    <Routes>
+      <Route element={<Layout />}>
         <Route
-            path='*'
-            element={
-              <Suspense fallback={<Loading />}>
-                <NotFoundPage />
-              </Suspense>
-            }
-          />
-      </Routes>
+          index
+          element={
+            <Suspense fallback={<Loading />}>
+              <HomePage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="SignIn"
+          element={
+            <Suspense fallback={<Loading />}>
+              <GuestGuard>
+                <SignInPage />
+              </GuestGuard>
+            </Suspense>
+          }
+        />
+        <Route
+          path="SignUp"
+          element={
+            <Suspense fallback={<Loading />}>
+              <GuestGuard>
+                <SignUpPage />
+              </GuestGuard>
+            </Suspense>
+          }
+        />
+        <Route
+          path="Write"
+          element={
+            <Suspense fallback={<Loading />}>
+              <AuthGuard>
+                <WritePage />
+              </AuthGuard>
+            </Suspense>
+          }
+        />
+        <Route
+          path="Profile"
+          element={
+            <Suspense fallback={<Loading />}>
+                <ProfileView />
+            </Suspense>
+          }
+        />
+        <Route
+          path="about"
+          element={
+            <Suspense fallback={<Loading />}>
+              <AboutPage />
+            </Suspense>
+          }
+        />
+      </Route>
+      <Route
+        path="*"
+        element={
+          <Suspense fallback={<Loading />}>
+            <NotFoundPage />
+          </Suspense>
+        }
+      />
+    </Routes>
   );
 }
 

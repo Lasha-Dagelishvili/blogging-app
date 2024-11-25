@@ -1,31 +1,12 @@
 import React, { useState } from "react";
 import { useMutation } from "react-query";
-import { supabase } from "../lib/connection";
 import { Link } from "react-router-dom";
+import { registerUser } from "@/supabase/auth";
 
 interface RegisterCredentials {
   email: string;
   password: string;
 }
-
-const registerUser = async (
-  credentials: RegisterCredentials
-): Promise<{ id: string; email: string }> => {
-  const { data, error } = await supabase.auth.signUp({
-    email: credentials.email,
-    password: credentials.password,
-  });
-
-  if (error) {
-    console.error("Supabase Error:", error);
-    throw new Error(error.message || "Registration failed");
-  }
-
-  return {
-    id: data.user?.id ?? "",
-    email: data.user?.email ?? "",
-  };
-};
 
 const SignUpPage: React.FC = () => {
   const [form, setForm] = useState<RegisterCredentials>({

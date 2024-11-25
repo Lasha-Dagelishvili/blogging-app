@@ -1,20 +1,19 @@
 import { createContext, PropsWithChildren, useState } from "react";
+import { User } from "@supabase/supabase-js";
 
-type AuthContextType = any;
+interface AuthContextType {
+  user: User | null;
+  setUser: (user: User | null) => void;
+}
 
+export const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthContext = createContext<AuthContextType>(null);
+export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
 
-export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) =>{
-    const [user, setUser] = useState<any>();
-
-    const handleSetUser = (user: any) =>{
-        setUser(user);
-    };
-
-    return(
-        <AuthContext.Provider value={{ user, handleSetUser }}>
-            {children}
-        </AuthContext.Provider>
-    );
+  return (
+    <AuthContext.Provider value={{ user, setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

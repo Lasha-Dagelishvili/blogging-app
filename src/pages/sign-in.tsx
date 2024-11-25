@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { useMutation } from "react-query";
-import { supabase } from "../lib/connection";
+import { loginUser } from "@/supabase/auth";
 
 interface LoginCredentials {
   email: string;
@@ -13,26 +13,6 @@ interface LoginResponse {
   email?: string;
 }
 
-const loginUser = async (credentials: LoginCredentials): Promise<LoginResponse> => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: credentials.email,
-    password: credentials.password,
-  });
-
-  if (error) {
-    console.error("Supabase Error:", error);
-    throw new Error(error.message || "Invalid email or password");
-  }
-
-  if (!data.user) {
-    throw new Error("User not found");
-  }
-
-  return {
-    id: data.user.id,
-    email: data.user.email,
-  };
-};
 
 const SignInPage: React.FC = () => {
   const navigate = useNavigate();

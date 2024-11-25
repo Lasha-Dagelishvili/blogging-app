@@ -4,16 +4,21 @@ import { Link, NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuthContext } from "@/context/auth/hooks/useAuthContext";
 import { useMutation } from "react-query";
-import { Logout } from "@/lib/connection";
+import { logout } from "@/supabase/auth";
 
 export const Header = () => {
-  const {user} = useAuthContext();
-
-  const {mutate:handleLogout} = useMutation({ mutationKey:['Logout'], mutationFn: Logout })
-
+  const { user, setUser } = useAuthContext();
   const { i18n } = useTranslation();
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+
+  const { mutate: handleLogout } = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: logout,
+    onSuccess: () => {
+      setUser(null);
+    },
+  });
 
   return (
     <header className="bg-black text-white w-full relative">
@@ -38,13 +43,29 @@ export const Header = () => {
           <button className="hover:text-gray-400">
             <SearchIcon className="w-5 h-5" />
           </button>
-
-          {user ? <span onClick={() => handleLogout} className="cursor-pointer">Logout</span> :<NavLink
-            to="/SignIn"
-            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-          >
-            Sign In
-          </NavLink>}
+          {user ? (
+            <div className="flex gap-x-2">
+              <NavLink
+              to="/Profile"
+              className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+              >
+              Profile
+              </NavLink>
+                <span
+                  onClick={() => handleLogout()}
+                  className="cursor-pointer hover:text-gray-400"
+                >
+                  Logout
+                </span>
+            </div>
+          ) : (
+            <NavLink
+              to="/SignIn"
+              className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+            >
+              Sign In
+            </NavLink>
+          )}
 
           <div className="relative">
             <button
