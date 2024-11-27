@@ -1,24 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import { useMutation } from "react-query";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { registerUser } from "@/supabase/auth";
 
 interface RegisterCredentials {
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
 const SignUpPage: React.FC = () => {
-  const [form, setForm] = useState<RegisterCredentials>({
-    email: "",
-    password: "",
-  });
-  const [confirmPassword, setConfirmPassword] = useState("");
-
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<RegisterCredentials>();
   const { mutate: signUp, isLoading, isError, error } = useMutation<
     { id: string; email: string },
     Error,
-    RegisterCredentials
+    Omit<RegisterCredentials, "confirmPassword">
   >(registerUser, {
     onSuccess: () => {
       alert("User registered successfully!");
@@ -28,67 +25,59 @@ const SignUpPage: React.FC = () => {
     },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (form.password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-
-    signUp(form);
+  const onSubmit = (data: RegisterCredentials) => {
+    const { email, password } = data;
+    signUp({ email, password });
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full">
         <h2 className="text-2xl font-bold mb-6 text-center">Sign Up for BitBlogs</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
-            <label htmlFor="email" className="block mb-2 text-sm">
-              Email
-            </label>
+            <label htmlFor="email" className="block mb-2 text-sm">Email</label>
             <input
               type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Invalid email format",
+                },
+              })}
               placeholder="Email"
-              required
               className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
             />
+            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
           </div>
           <div className="mb-4">
-            <label htmlFor="password" className="block mb-2 text-sm">
-              Password
-            </label>
+            <label htmlFor="password" className="block mb-2 text-sm">Password</label>
             <input
               type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
+              {...register("password", {
+                required: "Password is required",
+                minLength: { value: 6, message: "Password must be at least 6 characters" },
+                maxLength: { value: 20, message: "Password must not exceed 20 characters" },
+              })}
               placeholder="Password"
-              required
               className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
             />
+            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
           </div>
           <div className="mb-6">
-            <label htmlFor="confirm-password" className="block mb-2 text-sm">
-              Confirm Password
-            </label>
+            <label htmlFor="confirmPassword" className="block mb-2 text-sm">Confirm Password</label>
             <input
               type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              {...register("confirmPassword", {
+                validate: (value) => value === watch("password") || "Passwords do not match",
+              })}
               placeholder="Confirm Password"
-              required
               className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
             />
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
+            )}
           </div>
           <button
             type="submit"
