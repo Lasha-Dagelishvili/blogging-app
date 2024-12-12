@@ -13,6 +13,7 @@ import { useAuthContext } from "./context/auth/hooks/useAuthContext";
 import AuthGuard from "./copmonents/router-guards/auth";
 import GuestGuard from "./copmonents/router-guards/guest";
 import ProfileView from "./pages/account/profile/index";
+import TestView from "./pages/test";
 
 function App() {
 
@@ -89,6 +90,14 @@ function App() {
           element={
             <Suspense fallback={<Loading />}>
               <AboutPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="test"
+          element={
+            <Suspense fallback={<Loading />}>
+              <TestView />
             </Suspense>
           }
         />
